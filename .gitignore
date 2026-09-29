@@ -1,0 +1,14 @@
+# Local design previews, design-process notes and review screenshots (not part of the app)
+design-options/
+.impeccable/
+
+# Local editor / assistant settings
+.claude/
+.vscode/
+
+# OS clutter
+Thumbs.db
+.DS_Store
+
+# Product notes include personal details; kept local only
+PRODUCT.md

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PersonalFit Capture</title>
+<!-- Development only. Four full-height phone frames of one tab, for review screenshots.
+     /tools/capture.html?tab=weight&h=2200   (seeds test data first if the app is empty) -->
+<style>
+  body { margin: 0; background: #2a2d33; color: #c5cad2; font: 13px/1.4 "Segoe UI", sans-serif; }
+  .wrap { display: flex; gap: 24px; padding: 16px 20px; align-items: flex-start; }
+  figure { margin: 0; }
+  figcaption { margin-bottom: 6px; }
+  iframe { border: 0; display: block; background: #000; }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap"></div>
+<script type="module">
+  const q = new URLSearchParams(location.search);
+  const tab = q.get('tab') || 'weight', h = Number(q.get('h')) || 852;
+  const db = await import('/js/db.js');
+  await db.load();
+  if (!db.state.weights.length) {
+    const s = await import('/tools/seed.js');
+    await s.seed();
+    await db.saveWeight(new Date().toLocaleDateString('en-CA'), 180.2);
+  }
+  const frames = [['14 Pro dark', 393, 'dark'], ['14 Pro light', 393, 'light'], ['18 Pro dark', 402, 'dark'], ['18 Pro light', 402, 'light']];
+  document.getElementById('wrap').innerHTML = frames.map(([n, w, t]) =>
+    `<figure><figcaption>${n} (${w}px)</figcaption><iframe src="/?theme=${t}&tab=${tab}" width="${w}" height="${h}"></iframe></figure>`).join('');
+</script>
+</body>
+</html>

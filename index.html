@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PersonalFit</title>
+<meta name="description" content="Private, offline tracker for weight, calories, exercise and fasting.">
+<meta name="theme-color" content="#0E1012">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PersonalFit">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Apply the saved theme before first paint so there is no flash, and pick the
+  // matching iPhone status bar style (white text for dark, dark text for light).
+  try {
+    const q = new URLSearchParams(location.search).get('theme');
+    const t = q === 'light' || q === 'dark' ? q : (localStorage.getItem('pf-theme') || 'dark');
+    document.documentElement.dataset.theme = t;
+    if (t === 'light') {
+      document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content = 'default';
+      document.querySelector('meta[name="theme-color"]').content = '#FFFFFF';
+    }
+  } catch (e) {}
+</script>
+</head>
+<body>
+<main id="app">
+
+  <!-- WEIGHT -->
+  <section class="tab" id="tab-weight" aria-labelledby="h-weight">
+    <h1 class="large-title" id="h-weight">Weight</h1>
+    <div class="card setup-note" id="w-setup" hidden>
+      <p>Your profile uses placeholder values, so maintenance calories are only a rough guess. Enter your date of birth, height, and starting weight to fix that.</p>
+      <button type="button" class="btn block" id="w-setup-btn">Set up profile</button>
+    </div>
+    <div class="hero" id="w-hero"></div>
+
+    <form class="card entry" id="w-form" novalidate>
+      <div class="entry-row">
+        <label class="num-field">
+          <span class="sr-only">Weight</span>
+          <input id="w-value" name="value" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" enterkeyhint="done">
+          <span class="unit" data-unit="weight">lb</span>
+        </label>
+        <label class="date-field">
+          <span class="sr-only">Date</span>
+          <input id="w-date" name="date" type="date" data-today required>
+        </label>
+      </div>
+      <p class="hint" id="w-hint" aria-live="polite"></p>
+      <button class="btn primary block" type="submit">Save</button>
+    </form>
+
+    <h2 class="section-title">Trend</h2>
+    <div class="card chart-card" id="w-chart-card">
+      <div class="chart-controls">
+        <div class="seg" role="group" aria-label="Chart period" id="w-period">
+          <button type="button" data-v="week" aria-pressed="true">Week</button>
+          <button type="button" data-v="month" aria-pressed="false">Month</button>
+          <button type="button" data-v="year" aria-pressed="false">Year</button>
+        </div>
+        <div class="seg compact" role="group" aria-label="Chart unit" id="w-chart-unit">
+          <button type="button" data-v="lb" aria-pressed="true">lb</button>
+          <button type="button" data-v="kg" aria-pressed="false">kg</button>
+        </div>
+      </div>
+      <div class="period-nav">
+        <button type="button" class="icon-btn" id="w-prev" aria-label="Previous period"></button>
+        <div class="period-label" id="w-period-label" aria-live="polite"></div>
+        <button type="button" class="icon-btn" id="w-next" aria-label="Next period"></button>
+      </div>
+      <div class="chart" id="w-chart"></div>
+      <div class="chart-readout" id="w-readout" aria-live="polite"></div>
+      <div class="toggles">
+        <label class="toggle"><span class="swatch fit" aria-hidden="true"></span><span>Best fit</span><input type="checkbox" id="w-fit" role="switch"></label>
+        <label class="toggle"><span class="swatch avg" aria-hidden="true"></span><span>7-day average</span><input type="checkbox" id="w-avg" role="switch"></label>
+      </div>
+    </div>
+
+    <h2 class="section-title">History</h2>
+    <div class="list" id="w-history"></div>
+
+    <h2 class="section-title">Energy balance</h2>
+    <div class="card" id="w-balance"></div>
+  </section>
+
+  <!-- CALORIES -->
+  <section class="tab" id="tab-calories" aria-labelledby="h-calories" hidden>
+    <h1 class="large-title" id="h-calories">Calories</h1>
+    <div id="c-root"></div>
+  </section>
+
+  <!-- EXERCISE -->
+  <section class="tab" id="tab-exercise" aria-labelledby="h-exercise" hidden>
+    <h1 class="large-title" id="h-exercise">Exercise</h1>
+    <div id="e-root"></div>
+  </section>
+
+  <!-- FASTING -->
+  <section class="tab" id="tab-fasting" aria-labelledby="h-fasting" hidden>
+    <h1 class="large-title" id="h-fasting">Fasting</h1>
+    <div id="f-root"></div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="tab" id="tab-summary" aria-labelledby="h-summary" hidden>
+    <h1 class="large-title" id="h-summary">Summary</h1>
+    <div id="s-root"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="tab" id="tab-settings" aria-labelledby="h-settings" hidden>
+    <h1 class="large-title" id="h-settings">Settings</h1>
+    <div id="set-root"></div>
+  </section>
+
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <button type="button" data-tab="weight" aria-current="page"><span class="ti" data-icon="weight"></span><span>Weight</span></button>
+  <button type="button" data-tab="calories"><span class="ti" data-icon="calories"></span><span>Calories</span></button>
+  <button type="button" data-tab="exercise"><span class="ti" data-icon="exercise"></span><span>Exercise</span></button>
+  <button type="button" data-tab="fasting"><span class="ti" data-icon="fasting"></span><span>Fasting</span></button>
+  <button type="button" data-tab="summary"><span class="ti" data-icon="summary"></span><span>Summary</span></button>
+  <button type="button" data-tab="settings" class="gear" aria-label="Settings"><span class="ti" data-icon="gear"></span></button>
+</nav>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
