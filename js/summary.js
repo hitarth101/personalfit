@@ -1,9 +1,9 @@
 // Summary tab: weekly summary card and the logging calendar.
-import { state } from './db.js';
+import { state, saveSettings } from './db.js';
 import { weeklySummary, weekStart, earliestEntryDay, dayStr, monthStart, monthEnd, addMonths, weekday, localDayStr, formatDuration } from './calc.js';
 import {
   $, esc, today, todayNum, fmtInt, fmtWeight, fmt1, wUnit, dUnit, toDisplayDist, toDisplayWeight, signed,
-  dateLabel, shortDate, timeLabel, dateTimeLabel, openSheet, ICONS, MONTHS_LONG
+  dateLabel, shortDate, timeLabel, dateTimeLabel, openSheet, segmented, ICONS, MONTHS_LONG
 } from './ui.js';
 import { editWeight } from './weight.js';
 import { editCalorie } from './calories.js';
@@ -13,8 +13,9 @@ import { editFast } from './fasting.js';
 let ctx;
 let week = null;  // Monday day number
 let month = null; // first-of-month day number
+let habit;        // calendar filter: 'weight' | 'calories' | 'exercise'
 
-// Small marker shapes, distinguishable without color (functional spec §10).
+// Small marker shapes for the day panel headings.
 const MARK = {
   weight: '<svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3.2"/></svg>',
   calories: '<svg viewBox="0 0 8 8" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="0.8"/></svg>',
@@ -42,16 +43,23 @@ export function init(refresh, c) {
         <div class="period-label" id="s-mlabel" aria-live="polite"></div>
         <button type="button" class="icon-btn" id="s-mnext" aria-label="Next month">${ICONS.next}</button>
       </div>
+      <div class="seg" role="group" aria-label="Habit" id="s-habit">
+        <button type="button" data-v="weight">Weight</button>
+        <button type="button" data-v="calories">Calories</button>
+        <button type="button" data-v="exercise">Exercise</button>
+      </div>
+      <p class="cal-count" id="s-count" aria-live="polite"></p>
       <div class="cal-head" aria-hidden="true"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
       <div class="cal-grid" id="s-cal"></div>
-      <div class="legend">${Object.keys(MARK).map(k => `<span class="lg m-${k}">${MARK[k]}${LABEL[k]}</span>`).join('')}</div>
     </div>
-    <p class="footnote">Tap a day to see its entries or add one. A fast counts on the day it ended.</p>`;
+    <p class="footnote">Tap a day to see its entries or add one.</p>`;
 
   $('#s-wprev').onclick = () => { week -= 7; renderWeek(); };
   $('#s-wnext').onclick = () => { week += 7; renderWeek(); };
   $('#s-mprev').onclick = () => { month = addMonths(month, -1); renderCalendar(); };
   $('#s-mnext').onclick = () => { month = addMonths(month, 1); renderCalendar(); };
+  habit = HABIT[state.settings.calHabit] ? state.settings.calHabit : 'weight';
+  segmented($('#s-habit'), v => { habit = v; saveSettings({ calHabit: v }); renderCalendar(); })(habit);
   $('#s-cal').addEventListener('click', e => {
     const b = e.target.closest('[data-day]');
     if (b) openDay(b.dataset.day);
@@ -92,14 +100,8 @@ function renderWeek() {
       <span>Weight <b>${logged('weight')}</b></span><span>Calories <b>${logged('calories')}</b></span><span>Exercise <b>${logged('exercise')}</b></span></span></div>`;
 }
 
-function marksFor(date) {
-  const m = [];
-  if (state.weights.some(w => w.date === date)) m.push('weight');
-  if (state.calories.some(c => c.date === date)) m.push('calories');
-  if (state.exercise.some(x => x.date === date)) m.push('exercise');
-  if (state.fasts.some(f => localDayStr(f.end) === date)) m.push('fasting');
-  return m;
-}
+// Entries that mark a calendar day as logged, per filter. Any entry counts, including a 0-calorie one.
+const HABIT = { weight: () => state.weights, calories: () => state.calories, exercise: () => state.exercise };
 
 function renderCalendar() {
   const t = todayNum(), cur = monthStart(t), min = monthStart(firstDay());
@@ -109,19 +111,23 @@ function renderCalendar() {
   const [y, m] = dayStr(month).split('-').map(Number);
   $('#s-mlabel').textContent = `${MONTHS_LONG[m - 1]} ${y}`;
 
-  let html = '';
-  for (let i = 0; i < weekday(month); i++) html += '<span class="cal-cell"></span>';
   const end = monthEnd(month);
+  const logged = new Set(HABIT[habit]().map(x => x.date));
+  const name = LABEL[habit].toLowerCase();
+  let html = '', count = 0;
+  for (let i = 0; i < weekday(month); i++) html += '<span class="cal-cell"></span>';
   for (let d = month; d <= end; d++) {
     const n = d - month + 1;
-    if (d > t) { html += '<span class="cal-cell"></span>'; continue; } // future days stay blank
+    if (d > t) { html += `<span class="cal-cell future" aria-hidden="true"><span class="dn">${n}</span></span>`; continue; }
     const date = dayStr(d);
-    const marks = marksFor(date);
-    const label = `${dateLabel(date)}${marks.length ? ': ' + marks.map(k => LABEL[k]).join(', ') : ': nothing logged'}`;
-    html += `<button type="button" class="cal-cell day${d === t ? ' today' : ''}" data-day="${date}" aria-label="${esc(label)}">
-      <span class="dn">${n}</span><span class="marks">${marks.map(k => `<span class="m-${k}">${MARK[k]}</span>`).join('')}</span></button>`;
+    const on = logged.has(date);
+    if (on) count++;
+    const label = `${dateLabel(date)}: ${name} ${on ? 'logged' : 'not logged'}`;
+    html += `<button type="button" class="cal-cell day${on ? ' on' : ''}${d === t ? ' today' : ''}" data-day="${date}" aria-label="${esc(label)}">
+      <span class="dn">${n}</span></button>`;
   }
   $('#s-cal').innerHTML = html;
+  $('#s-count').innerHTML = `<b>${count}/${Math.min(end, t) - month + 1}</b> days with ${name} logged`;
 }
 
 function openDay(date) {

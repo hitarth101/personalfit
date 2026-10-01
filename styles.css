@@ -548,33 +548,24 @@ dialog.sheet::backdrop { background: var(--scrim); }
 .kv .r .v.days b { color: var(--text); font-weight: 600; margin-left: 4px; }
 
 .cal-card { padding: 8px 10px 12px; }
-.cal-card .period-nav { margin: 0 -2px 4px; }
+.cal-card .period-nav { margin: 0 -2px 6px; }
+.cal-card .seg { margin: 0 2px; }
+.cal-count { margin: 10px 0 8px; text-align: center; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.cal-count b { color: var(--text); font-weight: 600; }
 .cal-head, .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .cal-head span { text-align: center; font-size: 12px; color: var(--text-2); padding: 2px 0 6px; }
-.cal-cell { min-height: 50px; }
-.cal-cell.day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 3px;
-  padding: 6px 0 4px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-}
+.cal-cell { min-height: 46px; display: flex; align-items: center; justify-content: center; }
+.cal-cell.day { padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--text); }
 .cal-cell.day:active { background: var(--pressed); }
-.cal-cell .dn { font-size: 15px; font-variant-numeric: tabular-nums; width: 28px; height: 24px; line-height: 24px; border-radius: 12px; }
-.cal-cell.today .dn { box-shadow: inset 0 0 0 2px var(--text); font-weight: 700; }
-.marks { display: flex; gap: 2px; min-height: 9px; }
-.marks svg, .legend svg, .day-h svg { width: 9px; height: 9px; display: block; }
-.m-weight svg, .m-calories svg, .m-exercise svg, .m-fasting svg { fill: var(--main-ink); }
-.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--separator); font-size: 13px; color: var(--text-2); }
-.legend .lg { display: inline-flex; align-items: center; gap: 5px; }
-.legend svg { width: 10px; height: 10px; }
+.cal-cell .dn { font-size: 15px; font-variant-numeric: tabular-nums; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; text-align: center; }
+.cal-cell.on .dn { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+/* Today: a ring with a surface-colored gap, so it reads on both a filled and an empty day. */
+.cal-cell.today .dn { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text); font-weight: 700; }
+.cal-cell.future .dn { color: var(--text-3); opacity: 0.5; }
 
 .day-h { display: flex; align-items: center; gap: 8px; margin: 8px 0 -4px; font-size: 15px; font-weight: 600; }
-.day-h svg { width: 10px; height: 10px; }
+.day-h svg { width: 10px; height: 10px; display: block; }
+.m-weight svg, .m-calories svg, .m-exercise svg, .m-fasting svg { fill: var(--main-ink); }
 .day-h .tot { margin-left: auto; font-weight: 500; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .list.inset { background: var(--surface-2); }
 .list.inset .row { min-height: 44px; }

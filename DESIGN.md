@@ -177,7 +177,7 @@ The system rejects the fitness-app default the owner named: rings, badges, strea
 **Key Characteristics:**
 - One hero number per tab, 56-64px bold tabular numerals.
 - Graphite grounds with tonal surface steps; no decorative shadow.
-- Vermilion appears only on the primary button, the active tab, and weight data points on the chart.
+- Vermilion appears only on the primary button, the active tab, weight data points on the chart, and logged days on the calendar.
 - Meaning never rides on color alone: shapes, outlines, icons, and text carry it.
 - Stock iOS controls, drawn by hand in CSS and inline SVG; no icon font, no external assets.
 
@@ -186,7 +186,7 @@ The system rejects the fitness-app default the owner named: rings, badges, strea
 A cool graphite neutral ramp with one hot vermilion accent, defined twice: dark (default, on `:root` and `:root[data-theme="dark"]`) and light (`:root[data-theme="light"]`). Every color lives in a CSS custom property; code refers to roles (`--bg`, `--surface`, `--accent`), never to raw values.
 
 ### Primary
-- **Signal Vermilion** (`--accent`; dark `vermilion`, light `vermilion-light`): the fill of the primary button, one per view. Text on it uses `--on-accent` (near-black in dark, white in light).
+- **Signal Vermilion** (`--accent`; dark `vermilion`, light `vermilion-light`): the fill of the primary button, one per view, and of logged days on the calendar. Text on it uses `--on-accent` (near-black in dark, white in light).
 - **Vermilion Ink** (`--accent-ink`; dark `vermilion-ink`, light `vermilion-light-ink`): vermilion as a foreground: the active tab icon and label, and weight points on the chart (solid dots for real weigh-ins, hollow dots with a vermilion ring for filled-in display values).
 
 ### Neutral
@@ -198,16 +198,16 @@ A cool graphite neutral ramp with one hot vermilion accent, defined twice: dark 
 - **Segment On** (`--seg-on`): the selected segment pill.
 - **Text / Secondary / Tertiary** (`--text`, `--text-2`, `--text-3`): primary copy and hero numbers; labels, units, footnotes; placeholders, idle numbers, disabled items.
 - **Main** (`--main`, `--on-main`): the neutral "main color" fill with its paired text color; `--on-main` is the label color on the selected segment.
-- **Main Ink** (`--main-ink`): the neutral foreground used for focus rings, the 7-day average line, chart legend swatches, calendar markers, and the light-mode switch on-track.
+- **Main Ink** (`--main-ink`): the neutral foreground used for focus rings, the 7-day average line, chart legend swatches, day-sheet section markers, and the light-mode switch on-track.
 - **Separator** (`--separator`): hairlines between rows, stats, legend, and above the tab bar.
 - **Scrim** (`--scrim`): the backdrop behind an open sheet.
 
 ### Named Rules
-**The Three Jobs Rule.** Vermilion does exactly three jobs: the primary button fill, the active tab, and weight data points on the chart. Links, errors, destructive actions, "today", selection states, and labels are never vermilion.
+**The Four Jobs Rule.** Vermilion does exactly four jobs: the primary button fill, the active tab, weight data points on the chart, and logged days on the calendar. Links, errors, destructive actions, "today", selection states, and labels are never vermilion.
 
 **The Neutral Numbers Rule.** Data is never colored good or bad. A loss and a gain are both `--text`; no green, no red.
 
-**The Not By Color Alone Rule.** Every state that matters carries a non-color cue: errors get a warning icon and weight, calendar markers get distinct shapes, "today" gets a ring, real versus filled-in chart points differ as solid versus hollow.
+**The Not By Color Alone Rule.** Every state that matters carries a non-color cue: errors get a warning icon and weight, logged calendar days are solid discs against bare numbers, "today" gets a ring, real versus filled-in chart points differ as solid versus hollow.
 
 ## Typography
 
@@ -252,7 +252,7 @@ Flat by default. Depth is tonal: ground, then surface, then raised surface, each
 
 ## Shapes
 
-Continuous soft rectangles in the iOS manner, with radius scaled to size: 7px selected segment pill, 9px segment track and compact fields, 10px fields and calendar days, 12px cards, lists, and buttons (`--radius`), 14px top corners on sheets, and full pills (22px) for icon buttons and the fasting start-time chip. Circles for switch thumbs. Borders are absent except 1px separator hairlines and the 2px inset rings for focus and "today". Icons are hand-drawn inline SVG on a 24px grid with a 1.8px round-capped stroke (2-2.2px for navigation chevrons and close); the Weight icon is a scale dial.
+Continuous soft rectangles in the iOS manner, with radius scaled to size: 7px selected segment pill, 9px segment track and compact fields, 10px fields and calendar day cells (dates sit in circles), 12px cards, lists, and buttons (`--radius`), 14px top corners on sheets, and full pills (22px) for icon buttons and the fasting start-time chip. Circles for switch thumbs. Borders are absent except 1px separator hairlines and the 2px inset focus ring and the 2px "today" ring (drawn outside a surface-colored gap). Icons are hand-drawn inline SVG on a 24px grid with a 1.8px round-capped stroke (2-2.2px for navigation chevrons and close); the Weight icon is a scale dial.
 
 ## Components
 
@@ -307,15 +307,19 @@ Tactile and plain; one loud button per view at most.
 - "Every run day" reuses the key-value card. Distances and paces follow the Settings unit.
 
 ### Logging calendar
-- Seven-column month grid of 10px-radius day cells. Today is marked by a 2px `--text` inset ring around the date number, plus bold weight. Under each date, 9px markers in `--main-ink` coded by shape: circle for weight, rounded square for calories, triangle for exercise, diamond for fasting, with a legend beneath. The same shapes head the sections of the day sheet.
+- One habit at a time. A full-width segmented control (Weight, Calories, Exercise) under the month switcher picks it; Weight is the default and the last choice is remembered. There is no combined view, and fasts are not shown on the grid.
+- A count line under the control: "**24/30** days with weight logged", counting days elapsed in the month (through today).
+- Seven-column month grid. Each date sits in a 34px circle: logged days are a solid `--accent` disc with `--on-accent` 600 numerals; unlogged past days are bare `--text` numerals; future days are `--text-3` at half opacity and not tappable. Any entry counts, including a 0-calorie "0 today" entry. Rest days get no marker.
+- Today gets a 2px `--text` ring outside a 2px `--surface` gap, plus bold weight, so it reads on both a filled and an empty day.
+- Tapping a past day opens the day sheet, which still lists all four sections (weight, calories, exercise, fasting) headed by small `--main-ink` shapes.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep vermilion to its three jobs: the primary button, the active tab, and weight points on the chart.
+- **Do** keep vermilion to its four jobs: the primary button, the active tab, weight points on the chart, and logged calendar days.
 - **Do** make the logged number the largest thing on each tab (56px, 64px for the timer), bold and tabular.
 - **Do** raise surfaces by tone (`--bg`, then `--surface`, then `--surface-2`), not by shadow.
-- **Do** give every state a non-color cue: shape-coded markers, the outlined "today" ring, the warning icon on errors, solid versus hollow chart points.
+- **Do** give every state a non-color cue: filled versus bare calendar days, the outlined "today" ring, the warning icon on errors, solid versus hollow chart points.
 - **Do** style destructive actions as neutral buttons and confirm them inside the same sheet.
 - **Do** state calculation rules in a 13px footnote directly under the number they govern.
 - **Do** keep motion to the 90ms press, the 240ms sheet rise (fade under reduced motion), and the 150ms switch thumb.
