@@ -12,3 +12,6 @@ Thumbs.db
 
 # Product notes include personal details; kept local only
 PRODUCT.md
+
+# Build plans for features; kept local only
+run-plan-build.md

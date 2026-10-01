@@ -273,6 +273,10 @@ Tactile and plain; one loud button per view at most.
 - **Style:** iOS 51x31 track; off is `--track-off` with a white thumb.
 - **On:** light mode uses a `--main-ink` track with a white thumb; dark mode uses a near-white `--text` track with a `--bg` dark thumb and no shadow. The thumb slides 20px over 150ms.
 
+### Check circle
+- **Style:** 28px circle with a 2px `--text-3` ring, centered in a 44px tap area. Used only in the run plan's progression tracker.
+- **Checked:** takes the switch's on colors: a `--main-ink` fill with a white checkmark in light mode, a `--text` fill with a `--bg` checkmark in dark mode. Never vermilion. The checkmark shape carries the state, not the fill. No animation.
+
 ### Cards / Containers
 - **Corner Style:** 12px.
 - **Background:** `--surface`; lists nested inside a card use `--surface-2`.
@@ -296,6 +300,11 @@ Tactile and plain; one loud button per view at most.
 
 ### Weight chart
 - Hand-drawn SVG, 220px tall, on a card. Separator gridlines, 11px tabular axes in `--text-2`. The connecting line is `--text-2` at half opacity; real weigh-ins are solid `--accent-ink` dots, filled-in days are hollow dots ringed in `--accent-ink`; the best-fit line is a dashed `--text` stroke at 75%; the 7-day average is a 2.5px `--main-ink` line. Overlays toggle with switches whose legend swatches match the strokes.
+
+### Run plan (Exercise tab)
+- A full-width segmented control under the large title switches Exercise between **Log** (the default, and where Summary-calendar shortcuts land) and **Run plan**.
+- The plan's tables are inset grouped lists, not bordered grids. A 13px `--text-2` header row labels the columns; a 44px leading column holds the week number or weekday; row values (session time, sets × reps) are right-aligned, 600, tabular. Secondary lines (cool-down walk, location, how-to) are 13px `--text-2` and wrap instead of truncating. Rest days are `--text-2`. Interval sequences and number-unit pairs never break across lines.
+- "Every run day" reuses the key-value card. Distances and paces follow the Settings unit.
 
 ### Logging calendar
 - Seven-column month grid of 10px-radius day cells. Today is marked by a 2px `--text` inset ring around the date number, plus bold weight. Under each date, 9px markers in `--main-ink` coded by shape: circle for weight, rounded square for calories, triangle for exercise, diamond for fasting, with a legend beneath. The same shapes head the sections of the day sheet.

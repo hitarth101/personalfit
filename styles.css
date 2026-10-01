@@ -462,6 +462,49 @@ dialog.sheet::backdrop { background: var(--scrim); }
 .big-stat .u { font-size: 15px; color: var(--text-2); }
 .big-stat + .card-note { margin-top: 4px; }
 
+/* ---------- Run plan (Exercise tab) ---------- */
+
+.view-switch { margin: 0 0 16px; }
+.rp .row { align-items: baseline; }
+.rp .row .main .s { white-space: normal; overflow: visible; line-height: 18px; } /* wraps instead of "…" */
+.rp .row .main .s + .t { margin-top: 6px; }
+.rp-head { min-height: 0; padding-top: 10px; padding-bottom: 6px; font-size: 13px; line-height: 18px; color: var(--text-2); }
+.rp-lead { flex: 0 0 44px; font-variant-numeric: tabular-nums; }
+.rp-row.rest .t { color: var(--text-2); }
+.rp .row.rp-track { align-items: center; padding-top: 2px; padding-bottom: 2px; }
+.rp-check { flex: 1 1 0; display: grid; place-items: center; min-height: 44px; cursor: pointer; }
+.rp-head .rp-check { min-height: 0; }
+.card.rp-kv { padding: 4px 16px; }
+
+/* Check circle: drawn like the on/off switch, so "done" uses the switch's on colors, never vermilion. */
+.check {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border: 2px solid var(--text-3);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.check:checked { background: var(--main-ink); border-color: var(--main-ink); }
+.check:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6.5px;
+  width: 12px;
+  height: 6.5px;
+  border: solid var(--on-main);
+  border-width: 0 0 2.2px 2.2px;
+  transform: rotate(-45deg);
+}
+:root[data-theme="dark"] .check:checked { background: var(--text); border-color: var(--text); }
+:root[data-theme="dark"] .check:checked::after { border-color: var(--bg); }
+
 /* ---------- Fasting ---------- */
 
 .fast-card { display: grid; justify-items: center; text-align: center; padding: 28px 16px 16px; gap: 6px; }

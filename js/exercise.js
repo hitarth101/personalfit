@@ -1,15 +1,18 @@
 // Exercise tab: walk/jog/run entry with live preview, direct calorie entry,
-// entries for the selected date, average extra burn, and history.
+// entries for the selected date, average extra burn, and history. A Log / Run plan
+// switch at the top shows the running plan instead (runplan.js).
 import { state, saveExercise, deleteExercise, saveSettings } from './db.js';
 import { exerciseKcal, weightOnOrBefore, paceMinPerUnit, formatPace, exerciseAverage, dayStr } from './calc.js';
 import {
   $, esc, today, todayNum, parseNum, fmtInt, fmt1, dUnit, toDisplayDist, fromDisplayDist, dateLabel, shortDate,
   openSheet, confirmInSheet, flash, setHint, segmented, clampDateInput, pastDateNote, ICONS
 } from './ui.js';
+import * as runplan from './runplan.js';
 
 let refreshAll = () => {};
 let selected = null; // date whose entries are listed
 let shown = 10;
+let setView = () => {};
 const NAMES = { walk: 'Walk', jog: 'Jog', run: 'Run', direct: 'Other activity' };
 
 // Checks activity inputs (display units). Returns {minutes, km} or {error}.
@@ -35,8 +38,19 @@ function previewText(type, minStr, distStr, date) {
   return { text: `Pace ${pace} /${dUnit()} · ${fmtInt(kcalFor(type, r.km, date))} extra cal`, ok: true };
 }
 
+// Shows the activity log or the run plan. The app always starts on Log.
+function showView(v) {
+  setView(v);
+  $('#e-root').hidden = v !== 'log';
+  $('#e-plan').hidden = v !== 'plan';
+}
+
 export function init(refresh) {
   refreshAll = refresh;
+  setView = segmented($('#e-view'), showView);
+  runplan.init();
+  // ?view=plan opens the run plan directly (used by tools/shoot.js for screenshots).
+  if (new URLSearchParams(location.search).get('view') === 'plan') showView('plan');
   $('#e-root').innerHTML = `
     <form class="card entry" id="e-form" novalidate>
       <div class="seg" role="group" aria-label="Activity" id="e-type">
@@ -146,6 +160,7 @@ export function render() {
   renderDay();
   renderAverage();
   renderHistory();
+  runplan.render();
 }
 
 function rowHtml(x, withDate) {
@@ -194,6 +209,7 @@ function renderHistory() {
 
 // Sets both entry dates (used by the Summary calendar) and focuses the activity form.
 export function prefill(date) {
+  showView('log');
   $('#e-date').value = date;
   $('#e-kdate').value = date;
   selected = date;

@@ -100,7 +100,12 @@
   <!-- EXERCISE -->
   <section class="tab" id="tab-exercise" aria-labelledby="h-exercise" hidden>
     <h1 class="large-title" id="h-exercise">Exercise</h1>
+    <div class="seg view-switch" role="group" aria-label="View" id="e-view">
+      <button type="button" data-v="log" aria-pressed="true">Log</button>
+      <button type="button" data-v="plan" aria-pressed="false">Run plan</button>
+    </div>
     <div id="e-root"></div>
+    <div id="e-plan" hidden></div>
   </section>
 
   <!-- FASTING -->

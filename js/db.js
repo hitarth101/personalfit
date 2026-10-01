@@ -14,7 +14,8 @@ export const state = {
   profile: { ...DEFAULT_PROFILE },
   settings: { weightUnit: 'lb', distUnit: 'km', theme: 'dark' },
   activeFast: null, // {start}
-  lastBackup: null  // timestamp of the last Export press
+  lastBackup: null, // timestamp of the last Export press
+  runChecks: {}     // {'w3-wed': true}  run-plan days marked done; unrelated to logged exercise
 };
 
 function open() {
@@ -58,11 +59,15 @@ export async function load() {
   state.calories = calories;
   state.exercise = exercise;
   state.fasts = fasts;
+  // Optional meta values start empty so a restored backup without them doesn't keep stale ones.
+  state.activeFast = null;
+  state.runChecks = {};
   for (const m of meta) {
     if (m.key === 'profile') state.profile = { ...DEFAULT_PROFILE, ...m.value };
     if (m.key === 'settings') state.settings = { ...state.settings, ...m.value };
     if (m.key === 'activeFast') state.activeFast = m.value;
     if (m.key === 'lastBackup') state.lastBackup = m.value;
+    if (m.key === 'runChecks') state.runChecks = m.value;
   }
 }
 
@@ -140,6 +145,12 @@ export async function setActiveFast(v) {
   if (v) await putMeta('activeFast', v); else await del('meta', 'activeFast');
 }
 export async function setLastBackup(t) { state.lastBackup = t; await putMeta('lastBackup', t); }
+export async function setRunCheck(key, done) {
+  const next = { ...state.runChecks };
+  if (done) next[key] = true; else delete next[key];
+  state.runChecks = next;
+  await putMeta('runChecks', next);
+}
 
 // ---------- Backup ----------
 
@@ -150,7 +161,7 @@ export function exportData() {
     exportedAt: new Date().toISOString(),
     data: {
       weights: state.weights, calories: state.calories, exercise: state.exercise, fasts: state.fasts,
-      profile: state.profile, settings: state.settings, activeFast: state.activeFast
+      profile: state.profile, settings: state.settings, activeFast: state.activeFast, runChecks: state.runChecks
     }
   };
 }
@@ -176,6 +187,8 @@ export async function importData(obj) {
     meta.put({ key: 'profile', value: { ...DEFAULT_PROFILE, ...(d.profile || {}) } });
     meta.put({ key: 'settings', value: { ...state.settings, ...(d.settings || {}) } });
     if (d.activeFast) meta.put({ key: 'activeFast', value: d.activeFast }); else meta.delete('activeFast');
+    // Backups from before the run plan have no check marks; restoring one clears them.
+    meta.put({ key: 'runChecks', value: d.runChecks && typeof d.runChecks === 'object' ? d.runChecks : {} });
   });
   await load();
 }

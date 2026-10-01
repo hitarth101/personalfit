@@ -1,7 +1,7 @@
 // Service worker: keeps a copy of every app file on the phone so PersonalFit works offline.
 // When any app file changes, bump VERSION. The phone downloads the new copy in the
 // background and uses it the next time the app is opened.
-const VERSION = 'pf-v2';
+const VERSION = 'pf-v3';
 const FILES = [
   './',
   'index.html',
@@ -18,6 +18,7 @@ const FILES = [
   'js/fasting.js',
   'js/summary.js',
   'js/settings.js',
+  'js/runplan.js',
   'icons/icon-180.png',
   'icons/icon-192.png',
   'icons/icon-512.png'
